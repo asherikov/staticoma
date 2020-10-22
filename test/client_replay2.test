@@ -1,0 +1,21 @@
+<launch>
+
+    <env name="ROSCONSOLE_CONFIG_FILE" value="$(find staticoma)/test/rosconsole.config"/>
+
+    <node
+        pkg="staticoma"
+        type="replayer"
+        name="staticoma_replayer"
+        output="screen"
+        args="--config --bagfile $(find staticoma)/test/staticoma.bag"
+        required="false"
+    />
+
+    <test
+        pkg="staticoma"
+        type="test_client"
+        test-name="test_replay2"
+        time-limit="120.0"
+    />
+
+</launch>

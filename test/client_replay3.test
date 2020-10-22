@@ -1,0 +1,21 @@
+<launch>
+
+    <env name="ROSCONSOLE_CONFIG_FILE" value="$(find staticoma)/test/rosconsole.config"/>
+
+    <node pkg="rosbag" type="play" name="play" args="--keep-alive $(find staticoma)/test/staticoma.bag"/>
+
+    <param
+        name="/"
+        type="yaml"
+        command="rosrun staticoma replayer --bagfile --stdout '$(find staticoma)/test/staticoma.bag'"
+    />
+
+
+    <test
+        pkg="staticoma"
+        type="test_client"
+        test-name="test_replay3"
+        time-limit="120.0"
+    />
+
+</launch>

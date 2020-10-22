@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<package format="2">
+    <name>staticoma</name>
+    <version>0.1.0</version>
+    <description>
+        cmake and C++ ROS utilities that facilitate build-time configuration
+        file generation and run-time querying of configuration parameters.
+    </description>
+
+    <maintainer email="asherikov@yandex.com">asherikov</maintainer>
+
+    <license>Apache 2.0</license>
+
+    <buildtool_depend>catkin</buildtool_depend>
+
+    <depend>roscpp</depend>
+    <depend>std_msgs</depend>
+    <depend>rosbag_storage</depend>
+
+    <test_depend>rostest</test_depend>
+    <test_depend>roslib</test_depend>
+
+</package>

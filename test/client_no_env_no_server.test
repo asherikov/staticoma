@@ -1,0 +1,23 @@
+<launch>
+
+    <env name="ROSCONSOLE_CONFIG_FILE" value="$(find staticoma)/test/rosconsole.config"/>
+
+    <rosparam command="load" file="$(find staticoma)/test/parameter_server.yaml" />
+
+    <node
+        pkg="rostopic"
+        type="rostopic"
+        name="staticoma_config"
+        output="screen"
+        required="true"
+        args="pub --latch /staticoma/config std_msgs/String '&quot;client: true\n&quot;'"
+    />
+
+    <test
+        pkg="staticoma"
+        type="test_client"
+        test-name="test_client_no_env_no_server"
+        time-limit="120.0"
+    />
+
+</launch>

@@ -1,0 +1,6 @@
+set(STATICOMA_CMAKE_MODULE_PATH "@PROJECT_SOURCE_DIR@/cmake;@CMAKE_INSTALL_PREFIX@/@CATKIN_PACKAGE_SHARE_DESTINATION@/cmake")
+list(APPEND CMAKE_MODULE_PATH "${STATICOMA_CMAKE_MODULE_PATH}")
+
+include(staticoma)
+include(staticoma_export)
+include(staticoma_compose)

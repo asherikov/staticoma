@@ -1,0 +1,28 @@
+<launch>
+
+    <env name="ROSCONSOLE_CONFIG_FILE" value="$(find staticoma)/test/rosconsole.config"/>
+    <env name="STATICOMA_CONFIG_FILE" value="$(find staticoma)/test/client.yaml"/>
+
+    <rosparam command="load" file="$(find staticoma)/test/parameter_server.yaml" />
+
+    <!--
+    <node pkg="rosbag" type="record" name="rosbag_record" args="record - -output-name=staticoma.bag - -all - -exclude='/rosout.*'"/>
+    -->
+
+    <node
+        pkg="staticoma"
+        type="server"
+        name="staticoma_server"
+        output="screen"
+        required="true"
+    />
+
+
+    <test
+        pkg="staticoma"
+        type="test_client"
+        test-name="test_client"
+        time-limit="120.0"
+    />
+
+</launch>
