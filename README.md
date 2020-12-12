@@ -13,6 +13,7 @@ Dependencies:
 - `ROS` (`std_msgs`)
 - `Boost`
 
+Demo workspace -> https://github.com/asherikov/staticoma_workspace
 
 
 Terminology
