@@ -19,8 +19,8 @@ Demo workspace -> https://github.com/asherikov/staticoma_workspace
 Terminology
 -----------
 
-The following terms are not very common, but useful for definition of the
-problems solved by staticoma:
+The following terms are not common, but useful for definition of the problems
+addressed by staticoma:
 
 - Configuration parameters can be divided into three categories:
     1. build-time -- values are known during compilation and never change;
@@ -35,8 +35,9 @@ problems solved by staticoma:
 
 - Configuration composition -- construction of configuration parameters from
   multiple, potentially overlapping pieces scattered among multiple (ROS)
-  packages. Roughly speaking default parameters defined by packages providing
-  certain functionality are overlayed with robot-sepecific parameters.
+  packages in a stack. Roughly speaking default parameters defined by packages
+  providing certain functionality are overlayed with robot-sepecific
+  parameters.
 
 
 
@@ -49,7 +50,7 @@ specific node (service):
 
 - individual parameters can be passed via command line, but due to nested
   structure of roslaunch scripts such parameters often must be passed from top
-  level scripts to lower level scripts through a chain of intermediate scripts;
+  level to lower level scripts through a chain of intermediate scripts;
 
 - parameters can be uploaded from YAML files to 'parameter server'
   (http://wiki.ros.org/Parameter%20Server) -- ROS service which manages global
@@ -68,12 +69,11 @@ Scope and goals of `staticoma`
 `staticoma` addresses build-time and launch-time parameter management in order
 to alleviate some of parameter server issues:
 
-1. ROS allows recording data exchange between nodes using `rosbag` utility.
-   Replaying recorded data is a valuable debugging tool that allows testing
-   nodes in isolation on real data. The problem is that the content of ROS
-   parameter server is not saved to bag files, but often affects data exchange.
-   `staticoma` introduces a workaround that allows storing configurations in
-   bag files, making them self-sufficient.
+1. ROS allows recording data exchange between nodes using `rosbag` utility. The
+   problem is that the content of ROS parameter server is not saved to bag
+   files, but often affects data exchange. `staticoma` introduces a workaround
+   that allows storing configurations in bag files, making them
+   self-sufficient.
 
 2. Launch-time configuration composition performed by `roslaunch` may be
    confusing since configuration pieces are stored in different locations and
@@ -101,16 +101,18 @@ Key design concepts
 
 ### Handling build-time parameters
 
-1. All build-time parameters of a stack is written to a single file during
+1. All build-time parameters of a stack are written to a single file during
    compilation ('stack-config') using custom `cmake` functions.
 
-2. stack-config is composed step by step by overlaying parameter files provided by
-   package dependencies. For example: package B depends on A, A defines
-   build-time parameters:
+2. stack-config is composed step by step by overlaying parameter files provided
+   by package dependencies. For example: package B depends on A, A defines
+   build-time parameters
+   (https://github.com/asherikov/staticoma_workspace/blob/master/src/package_a/CMakeLists.txt#L15):
 ```
 staticoma_export("config/base_config.yaml")
 ```
 and B builds on top of them
+(https://github.com/asherikov/staticoma_workspace/blob/master/src/package_b/CMakeLists.txt#L17)
 ```
 staticoma_compose(
     merged_config.yaml
@@ -118,7 +120,9 @@ staticoma_compose(
     package_b "config/extended_config.yaml"
 )
 ```
-`merged_config.yaml` can in turn be used by other packages, etc.
+`merged_config.yaml` can in turn be used by other packages
+(https://github.com/asherikov/staticoma_workspace/blob/master/src/package_c/CMakeLists.txt#L28),
+etc.
 
 3. If it is necessary to prevent package B from addiing new parameters to
    configuration file provided by A, then `STRICT` keyword can be used, e.g.,
@@ -135,7 +139,8 @@ staticoma_compose(
    supports only 'overwrite' strategy, where the contents of an array is
    completely overriden if the redefined in overlaying parameters. `staticoma`
    uses the same strategy by default, but also supports 'append' strategy,
-   which extends arrays with new members, e.g.:
+   which extends arrays with new members, e.g.
+   (https://github.com/asherikov/staticoma_workspace/blob/master/src/package_c/CMakeLists.txt#L20):
 ```
 staticoma_compose(
     merged_config.yaml
@@ -156,7 +161,8 @@ staticoma_compose(
    nodes should prefer reading stack-config directly from a file.
 
 8. Passing of stack-config filename:
-    - environment variable -- should be used by default;
+    - environment variable -- should be used by default
+      (https://github.com/asherikov/staticoma/blob/master/test/client.test#L4);
     - command line argument -- can be provided by the user if necessary.
 
 9. Initialization of stack-config in a node:
@@ -170,15 +176,21 @@ staticoma_compose(
        and use it as necessary.
 
 10. Some parameters, such as robot description, must be set in parameter
-    server, moreover, such parameters must be restored when replaying a ROS
-    bag. In order to facilitate this, `staticoma` server can dump all
-    parameters and publish them in a message. It would also be necessary to
-    implement additional `replayer` service that would be executed alongside
-    `rosbag play` and upload contents of the parameter message to parameter
-    server. Unfortunately, ROS nodes using parameter server during bag
-    replaying must not rely on existance of parameters at startup, since
-    parameter can only be uploaded after replayer has been started and received
-    parameter message.
+    server, so we cannot get rid of parameter server completely. `staticoma`
+    server can dump all parameters and publish them in a message to be saved in
+    bag files.
+
+11. Restoring of parameter server content from a bag file should be performed
+    by an additional `replayer` service that would be executed alongside
+    `rosbag play`.
+
+12. `replayer` can be started in two ways:
+    - as a normal ROS node --
+      https://github.com/asherikov/staticoma/blob/master/test/client_replay1.test#L7),
+      in this case parameters are not guaranteed to be uploaded before other
+      nodes are started;
+    - inside `<param>` roslaunch tag --
+      https://github.com/asherikov/staticoma/blob/master/test/client_replay3.test#L7.
 
 
 ### Handling launch-time and run-time parameters
@@ -197,14 +209,14 @@ staticoma_compose(
    provider declaration, or instantiate a separate processing thread for each.
 
 4. roslaunch `arg`, `param`, and `rosparam` tags can be replaced with nodes
-   starting rostopic with `rostopic pub --latch` nodes.
+   starting rostopic with `rostopic pub --latch` nodes, e.g.
+   https://github.com/asherikov/staticoma_workspace/blob/master/src/package_b/launch/node.launch#L3.
 
-5. Consuming parameters:
+5. Consuming parameters
+   (https://github.com/asherikov/staticoma_workspace/blob/master/src/package_c/src/node.cpp#L101):
     1. obtain stack-config to identify parameter providers.
     2. wait for published parameters
     3. parse parameters
-
-6. Waiting on topic may be optional or have timeout.
 
 
 ### Parameter representation
@@ -228,7 +240,4 @@ staticoma_compose(
 
 2. It could be interesting to consider migration from YAML to jsonnet. Jsonnet
    is a data templating language (https://jsonnet.org/) which has build-in JSON
-   merging functionality and a lot of other functions. Reference jsonnet
-   implementation is in C++ which would be easy to integrate and provides cli
-   utility that can be used in cmake functions and a library that can be used
-   in parameter consumers for launch-time parameter composition.
+   merging functionality and a lot of other functions.
