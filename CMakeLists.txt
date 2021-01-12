@@ -2,9 +2,7 @@ cmake_minimum_required(VERSION 2.8.3)
 project(staticoma)
 
 ## Find catkin macros and libraries
-## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
-## is used, also find other catkin packages
-find_package(catkin REQUIRED
+find_package(catkin REQUIRED COMPONENTS
     roscpp
     rosbag_storage
     std_msgs
@@ -26,7 +24,7 @@ find_package(catkin REQUIRED
 catkin_package(
     INCLUDE_DIRS include
 #    LIBRARIES ${PROJECT_NAME}
-    CATKIN_DEPENDS std_msgs
+    CATKIN_DEPENDS roscpp std_msgs
 #    DEPENDS system_lib
     CFG_EXTRAS ${PROJECT_NAME}_cmake_path.cmake
 )
@@ -116,12 +114,12 @@ install(DIRECTORY include/${PROJECT_NAME}/
 #    # myfile2
 #    DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
 #)
-foreach(DIR launch)
-    install(DIRECTORY ${DIR}
-        DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
-        USE_SOURCE_PERMISSIONS
-    )
-endforeach()
+#foreach(DIR launch)
+#    install(DIRECTORY ${DIR}
+#        DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
+#        USE_SOURCE_PERMISSIONS
+#    )
+#endforeach()
 #install(FILES ${CMAKE_SOURCE_DIR}/plugin.xml
 #    DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
 #)
