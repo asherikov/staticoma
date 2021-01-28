@@ -241,3 +241,11 @@ staticoma_compose(
 2. It could be interesting to consider migration from YAML to jsonnet. Jsonnet
    is a data templating language (https://jsonnet.org/) which has build-in JSON
    merging functionality and a lot of other functions.
+
+
+
+Related software
+----------------
+
+* https://github.com/hordurk/rosbag_metadata -- Tool for collecting and writing
+  metadata to ROS bagfiles or to accompanying yaml files.
