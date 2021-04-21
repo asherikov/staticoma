@@ -8,8 +8,7 @@
     @brief
 */
 
-#include <stdio.h>
-
+#include <cstdio>
 #include <cstdlib>
 #include <fstream>
 
@@ -20,19 +19,17 @@
 
 int main(int argc, char **argv)
 {
-    ros::init(argc, argv, "staticoma_server");
-    ros::NodeHandle nh("~");
-
     try
     {
-        bool data_published = false;
+        ros::init(argc, argv, "staticoma_server");
+        ros::NodeHandle nh("~");
 
         ros::Publisher config_publisher;
         {
             const char *config_file_name_ptr = std::getenv("STATICOMA_CONFIG_FILE");
             const std::string config_file_name = nullptr == config_file_name_ptr ? "" : config_file_name_ptr;
 
-            if (true == boost::filesystem::is_regular(config_file_name))
+            if (boost::filesystem::is_regular(config_file_name))
             {
                 std_msgs::String config_msg;
                 std::ifstream ifs(config_file_name);
@@ -40,7 +37,6 @@ int main(int argc, char **argv)
 
                 config_publisher = nh.advertise<std_msgs::String>("/staticoma/config", /*queue_size=*/1, /*latch=*/true);
                 config_publisher.publish(config_msg);
-                data_published = true;
             }
             else
             {
@@ -53,13 +49,13 @@ int main(int argc, char **argv)
             std_msgs::String parameter_server_msg;
 
             {
-                FILE *pipe_fd = popen("rosparam dump", "r");
+                FILE *pipe_fd = popen("rosparam dump", "r"); // NOLINT
                 if (nullptr != pipe_fd)
                 {
                     const std::size_t max_read_size = 1024 * 1024 * 10;
                     const std::size_t read_buffer_size = 1024 * 10;
                     std::size_t total_counter = 0;
-                    char read_buffer[read_buffer_size];
+                    std::array<char, read_buffer_size> read_buffer;
 
                     std::vector<std::string> clear_keys{ "rosversion", "rosdistro", "run_id", "roslaunch" };
                     bool clear_key = false;
@@ -67,54 +63,52 @@ int main(int argc, char **argv)
 
                     for (;;)
                     {
-                        if (nullptr == fgets(read_buffer, read_buffer_size, pipe_fd))
+                        if (nullptr == fgets(read_buffer.data(), read_buffer.size(), pipe_fd))
                         {
                             break;
                         }
-                        else
+
+                        const std::size_t bytes_read = strnlen(read_buffer.data(), read_buffer.size());
+                        if (bytes_read == read_buffer.size())
                         {
-                            const std::size_t bytes_read = strnlen(read_buffer, read_buffer_size);
-                            if (bytes_read == read_buffer_size)
+                            throw std::runtime_error("Input line from `rosparam dump` is too long.");
+                        }
+
+                        total_counter += bytes_read;
+                        if (total_counter >= max_read_size)
+                        {
+                            throw std::runtime_error("Too much input from `rosparam dump`.");
+                        }
+
+
+                        if (clear_key)
+                        {
+                            // this is crap
+                            if (bytes_read > 1 and isalpha(read_buffer[0]) > 0)
                             {
-                                throw("Input line from `rosparam dump` is too long.");
+                                clear_key = false;
                             }
+                        }
 
-                            total_counter += bytes_read;
-                            if (total_counter >= max_read_size)
+                        if (not clear_key)
+                        {
+                            for (const std::string &key : clear_keys)
                             {
-                                throw("Too much input from `rosparam dump`.");
-                            }
-
-
-                            if (true == clear_key)
-                            {
-                                // this is crap
-                                if (bytes_read > 1 and isalpha(read_buffer[0]) > 0)
+                                if (bytes_read >= key.size())
                                 {
-                                    clear_key = false;
-                                }
-                            }
-
-                            if (false == clear_key)
-                            {
-                                for (const std::string &key : clear_keys)
-                                {
-                                    if (bytes_read >= key.size())
+                                    if (0 == strncmp(read_buffer.data(), key.c_str(), key.size()))
                                     {
-                                        if (0 == strncmp(read_buffer, key.c_str(), key.size()))
-                                        {
-                                            clear_key = true;
-                                            break;
-                                        }
+                                        clear_key = true;
+                                        break;
                                     }
                                 }
                             }
+                        }
 
-                            if (false == clear_key)
-                            {
-                                parameter_server_msg.data.insert(
-                                        parameter_server_msg.data.end(), read_buffer, read_buffer + bytes_read);
-                            }
+                        if (not clear_key)
+                        {
+                            parameter_server_msg.data.insert(
+                                    parameter_server_msg.data.end(), read_buffer.data(), read_buffer.data() + bytes_read);
                         }
                     }
                     pclose(pipe_fd);
@@ -124,13 +118,9 @@ int main(int argc, char **argv)
             parameter_server_publisher =
                     nh.advertise<std_msgs::String>("/staticoma/parameter_server", /*queue_size=*/1, /*latch=*/true);
             parameter_server_publisher.publish(parameter_server_msg);
-            data_published = true;
         }
 
-        if (true == data_published)
-        {
-            ros::spin();
-        }
+        ros::spin();
     }
     catch (const std::exception &e)
     {

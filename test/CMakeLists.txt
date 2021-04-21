@@ -1,5 +1,6 @@
 find_package(rostest REQUIRED)
 find_package(roslib REQUIRED)
+#message(FATAL_ERROR ">>${GTEST_INCLUDE_DIRS}<<${GMOCK_INCLUDE_DIRS}>>")
 
 # client + server, client gets config from a file using environment variable
 add_rostest_gtest(test_client client.test client.cpp)

@@ -110,5 +110,5 @@ function(staticoma_compose OUTPUT_FILE)
         )
     endif()
 
-    install(FILES ${OUTPUT_FILE} DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/staticoma)
+    install(FILES ${OUTPUT_FILE_PATH} DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/staticoma)
 endfunction()

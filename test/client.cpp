@@ -16,7 +16,7 @@
 #include <gtest/gtest.h>
 
 
-TEST(client, client)
+TEST(client, Client)
 {
     ROS_ERROR("STATICOMA_CONFIG_FILE='%s'", std::getenv("STATICOMA_CONFIG_FILE"));
 
@@ -39,13 +39,13 @@ TEST(client, client)
     }
 }
 
-TEST(client, client_no_file)
+TEST(client, ClientNoFile)
 {
     staticoma::Client staticoma_client;
     EXPECT_FALSE(staticoma_client.fetchConfig("nonexistent.yaml"));
 }
 
-TEST(client, client_file)
+TEST(client, ClientFile)
 {
     staticoma::Client staticoma_client;
     EXPECT_TRUE(staticoma_client.fetchConfig(ros::package::getPath("staticoma") + "/test/client.yaml"));
@@ -57,7 +57,7 @@ TEST(client, client_file)
     EXPECT_FALSE(staticoma_client.fetchRobotDescription(ros::Duration(1.0)));
 }
 
-TEST(client, client_implicit_fetch)
+TEST(client, ClientImplicitFetch)
 {
     ROS_ERROR("STATICOMA_CONFIG_FILE='%s'", std::getenv("STATICOMA_CONFIG_FILE"));
 
@@ -71,7 +71,7 @@ TEST(client, client_implicit_fetch)
     EXPECT_FALSE(staticoma_client.fetchRobotDescription(ros::Duration(1.0)));
 }
 
-TEST(client, client_no_file_implicit_fetch)
+TEST(client, ClientNoFileImplicitFetch)
 {
     staticoma::Client staticoma_client;
     EXPECT_EQ(staticoma_client.getConfigString("nonexistent.yaml"), "");
@@ -79,7 +79,7 @@ TEST(client, client_no_file_implicit_fetch)
     EXPECT_FALSE(staticoma_client.fetchRobotDescription(ros::Duration(1.0)));
 }
 
-TEST(client_file, client_file_implicit_fetch)
+TEST(client, ClientFileImplicitFetch)
 {
     staticoma::Client staticoma_client;
     EXPECT_EQ(staticoma_client.getConfigString(ros::package::getPath("staticoma") + "/test/client.yaml"), "client: true\n");
@@ -98,13 +98,11 @@ int main(int argc, char **argv)
     ros::NodeHandle nh;
     ros::AsyncSpinner spinner(1);
     spinner.start();
-    if (true == ros::Time::waitForValid(ros::WallDuration(10.0)))
+    if (ros::Time::waitForValid(ros::WallDuration(10.0)))
     {
         return (RUN_ALL_TESTS());
     }
-    else
-    {
-        ROS_ERROR("No valid time.");
-        return (EXIT_FAILURE);
-    }
+
+    ROS_ERROR("No valid time.");
+    return (EXIT_FAILURE);
 }

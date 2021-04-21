@@ -32,12 +32,12 @@ namespace
 {
     void load(const std::string &parameters)
     {
-        FILE *pipe_fd = popen("rosparam load -", "w");
+        FILE *pipe_fd = popen("rosparam load -", "w"); // NOLINT
         if (nullptr != pipe_fd)
         {
             if (parameters.size() != fwrite(parameters.data(), sizeof(char), parameters.size(), pipe_fd))
             {
-                throw("Could not load parameter server contents.");
+                throw std::runtime_error("Could not load parameter server contents.");
             }
             pclose(pipe_fd);
         }
@@ -72,7 +72,7 @@ int main(int argc, char **argv)
 
             for (const std::string &arg : non_option_args)
             {
-                if (true == boost::filesystem::is_regular(arg))
+                if (boost::filesystem::is_regular(arg))
                 {
                     bag_files.emplace_back(arg);
                 }
