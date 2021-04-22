@@ -40,7 +40,6 @@ include(CMakeParseArguments)
 # CCW flags
 # --------------
 if (CCW_CLANG_TIDY)
-    include_directories(SYSTEM /usr/src/googletest/googletest/include)
     set (CMAKE_CXX_CLANG_TIDY "${CCW_CLANG_TIDY}")
 endif()
 if (CCW_CXX_FLAGS)
