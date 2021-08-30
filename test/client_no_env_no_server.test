@@ -18,6 +18,7 @@
         type="test_client"
         test-name="test_client_no_env_no_server"
         time-limit="120.0"
+        launch-prefix="$(optenv CCWS_NODE_LAUNCH_PREFIX)"
     />
 
 </launch>

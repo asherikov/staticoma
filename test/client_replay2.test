@@ -9,6 +9,7 @@
         output="screen"
         args="--config --bagfile $(find staticoma)/test/staticoma.bag"
         required="false"
+        launch-prefix="$(optenv CCWS_NODE_LAUNCH_PREFIX)"
     />
 
     <test
@@ -16,6 +17,7 @@
         type="test_client"
         test-name="test_replay2"
         time-limit="120.0"
+        launch-prefix="$(optenv CCWS_NODE_LAUNCH_PREFIX)"
     />
 
 </launch>

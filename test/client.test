@@ -15,6 +15,7 @@
         name="staticoma_server"
         output="screen"
         required="true"
+        launch-prefix="$(optenv CCWS_NODE_LAUNCH_PREFIX)"
     />
 
 
@@ -23,6 +24,7 @@
         type="test_client"
         test-name="test_client"
         time-limit="120.0"
+        launch-prefix="$(optenv CCWS_NODE_LAUNCH_PREFIX)"
     />
 
 </launch>

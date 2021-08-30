@@ -10,6 +10,7 @@
         name="staticoma_replayer"
         output="screen"
         required="false"
+        launch-prefix="$(optenv CCWS_NODE_LAUNCH_PREFIX)"
     />
 
     <test
@@ -17,6 +18,7 @@
         type="test_client"
         test-name="test_replay0"
         time-limit="120.0"
+        launch-prefix="$(optenv CCWS_NODE_LAUNCH_PREFIX)"
     />
 
 </launch>

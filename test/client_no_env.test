@@ -10,6 +10,7 @@
         name="staticoma_server"
         output="screen"
         required="true"
+        launch-prefix="$(optenv CCWS_NODE_LAUNCH_PREFIX)"
     >
         <env name="STATICOMA_CONFIG_FILE" value="$(find staticoma)/test/client.yaml"/>
     </node>
@@ -20,6 +21,7 @@
         type="test_client"
         test-name="test_client_no_env"
         time-limit="120.0"
+        launch-prefix="$(optenv CCWS_NODE_LAUNCH_PREFIX)"
     />
 
 </launch>

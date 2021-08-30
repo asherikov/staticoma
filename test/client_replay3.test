@@ -16,6 +16,7 @@
         type="test_client"
         test-name="test_replay3"
         time-limit="120.0"
+        launch-prefix="$(optenv CCWS_NODE_LAUNCH_PREFIX)"
     />
 
 </launch>
