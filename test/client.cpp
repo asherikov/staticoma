@@ -16,9 +16,12 @@
 #include <gtest/gtest.h>
 
 
-TEST(client, Client)
+#define STATICOMA_TEST(...) TEST(__VA_ARGS__)  // NOLINT
+
+
+STATICOMA_TEST(client, Client)
 {
-    ROS_ERROR("STATICOMA_CONFIG_FILE='%s'", std::getenv("STATICOMA_CONFIG_FILE"));
+    ROS_ERROR("STATICOMA_CONFIG_FILE='%s'", std::getenv("STATICOMA_CONFIG_FILE"));  // NOLINT(concurrency-mt-unsafe)
 
     staticoma::Client staticoma_client;
 
@@ -39,13 +42,13 @@ TEST(client, Client)
     }
 }
 
-TEST(client, ClientNoFile)
+STATICOMA_TEST(client, ClientNoFile)
 {
     staticoma::Client staticoma_client;
     EXPECT_FALSE(staticoma_client.fetchConfig("nonexistent.yaml"));
 }
 
-TEST(client, ClientFile)
+STATICOMA_TEST(client, ClientFile)
 {
     staticoma::Client staticoma_client;
     EXPECT_TRUE(staticoma_client.fetchConfig(ros::package::getPath("staticoma") + "/test/client.yaml"));
@@ -57,9 +60,9 @@ TEST(client, ClientFile)
     EXPECT_FALSE(staticoma_client.fetchRobotDescription(ros::Duration(1.0)));
 }
 
-TEST(client, ClientImplicitFetch)
+STATICOMA_TEST(client, ClientImplicitFetch)
 {
-    ROS_ERROR("STATICOMA_CONFIG_FILE='%s'", std::getenv("STATICOMA_CONFIG_FILE"));
+    ROS_ERROR("STATICOMA_CONFIG_FILE='%s'", std::getenv("STATICOMA_CONFIG_FILE"));  // NOLINT(concurrency-mt-unsafe)
 
     staticoma::Client staticoma_client;
 
@@ -71,7 +74,7 @@ TEST(client, ClientImplicitFetch)
     EXPECT_FALSE(staticoma_client.fetchRobotDescription(ros::Duration(1.0)));
 }
 
-TEST(client, ClientNoFileImplicitFetch)
+STATICOMA_TEST(client, ClientNoFileImplicitFetch)
 {
     staticoma::Client staticoma_client;
     EXPECT_EQ(staticoma_client.getConfigString("nonexistent.yaml"), "");
@@ -79,10 +82,12 @@ TEST(client, ClientNoFileImplicitFetch)
     EXPECT_FALSE(staticoma_client.fetchRobotDescription(ros::Duration(1.0)));
 }
 
-TEST(client, ClientFileImplicitFetch)
+STATICOMA_TEST(client, ClientFileImplicitFetch)
 {
     staticoma::Client staticoma_client;
-    EXPECT_EQ(staticoma_client.getConfigString(ros::package::getPath("staticoma") + "/test/client.yaml"), "client: true\n");
+    EXPECT_EQ(
+            staticoma_client.getConfigString(ros::package::getPath("staticoma") + "/test/client.yaml"),
+            "client: true\n");
     std::string config;
     std::getline(staticoma_client.getConfigStream(), config);
     EXPECT_EQ(config, "client: true");

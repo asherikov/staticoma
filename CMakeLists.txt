@@ -56,6 +56,7 @@ endif()
 include_directories(
     include
     SYSTEM ${catkin_INCLUDE_DIRS}
+    SYSTEM src/3rdparty
 )
 
 ## Declare a C++ library

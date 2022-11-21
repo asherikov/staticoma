@@ -32,7 +32,7 @@ namespace
 {
     void load(const std::string &parameters)
     {
-        FILE *pipe_fd = popen("rosparam load -", "w"); // NOLINT
+        FILE *pipe_fd = popen("rosparam load -", "w");  // NOLINT
         if (nullptr != pipe_fd)
         {
             if (parameters.size() != fwrite(parameters.data(), sizeof(char), parameters.size(), pipe_fd))
@@ -56,7 +56,8 @@ int main(int argc, char **argv)
         auto help_option = op.add<popl::Switch>("h", "help", "produce help message");
         auto publish_config_option = op.add<popl::Switch>("c", "config", "publish staticoma config message");
         auto bagfile_option = op.add<popl::Switch>("b", "bagfile", "read topics from bag file(s)");
-        auto stdout_option = op.add<popl::Switch>("o", "stdout", "write parameter server to stdout (to be used in <param ... />)");
+        auto stdout_option =
+                op.add<popl::Switch>("o", "stdout", "write parameter server to stdout (to be used in <param ... />)");
 
         op.parse(argc, argv);
 
@@ -203,8 +204,8 @@ int main(int argc, char **argv)
 
                             if (nullptr != msg_ptr)
                             {
-                                config_publisher =
-                                        nh.advertise<std_msgs::String>("/staticoma/config", /*queue_size=*/1, /*latch=*/true);
+                                config_publisher = nh.advertise<std_msgs::String>(
+                                        "/staticoma/config", /*queue_size=*/1, /*latch=*/true);
                                 config_publisher.publish(*msg_ptr);
                                 done = true;
                                 break;

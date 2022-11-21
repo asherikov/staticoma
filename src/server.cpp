@@ -26,7 +26,7 @@ int main(int argc, char **argv)
 
         ros::Publisher config_publisher;
         {
-            const char *config_file_name_ptr = std::getenv("STATICOMA_CONFIG_FILE");
+            const char *config_file_name_ptr = std::getenv("STATICOMA_CONFIG_FILE");  // NOLINT(concurrency-mt-unsafe)
             const std::string config_file_name = nullptr == config_file_name_ptr ? "" : config_file_name_ptr;
 
             if (boost::filesystem::is_regular(config_file_name))
@@ -35,7 +35,8 @@ int main(int argc, char **argv)
                 std::ifstream ifs(config_file_name);
                 config_msg.data.assign(std::istreambuf_iterator<char>(ifs), std::istreambuf_iterator<char>());
 
-                config_publisher = nh.advertise<std_msgs::String>("/staticoma/config", /*queue_size=*/1, /*latch=*/true);
+                config_publisher =
+                        nh.advertise<std_msgs::String>("/staticoma/config", /*queue_size=*/1, /*latch=*/true);
                 config_publisher.publish(config_msg);
             }
             else
@@ -49,7 +50,7 @@ int main(int argc, char **argv)
             std_msgs::String parameter_server_msg;
 
             {
-                FILE *pipe_fd = popen("rosparam dump", "r"); // NOLINT
+                FILE *pipe_fd = popen("rosparam dump", "r");  // NOLINT
                 if (nullptr != pipe_fd)
                 {
                     const std::size_t max_read_size = 1024 * 1024 * 10;
@@ -108,7 +109,9 @@ int main(int argc, char **argv)
                         if (not clear_key)
                         {
                             parameter_server_msg.data.insert(
-                                    parameter_server_msg.data.end(), read_buffer.data(), read_buffer.data() + bytes_read);
+                                    parameter_server_msg.data.end(),
+                                    read_buffer.data(),
+                                    read_buffer.data() + bytes_read);
                         }
                     }
                     pclose(pipe_fd);

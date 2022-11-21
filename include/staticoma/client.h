@@ -47,9 +47,9 @@ namespace staticoma
             config_content_.str("");
 
 
-            if (true == given_config_file_name.empty())
+            if (given_config_file_name.empty())
             {
-                const char *config_file_name_ptr = std::getenv("STATICOMA_CONFIG_FILE");
+                const char *config_file_name_ptr = std::getenv("STATICOMA_CONFIG_FILE");  // NOLINT(concurrency-mt-unsafe)
                 config_file_name_ = nullptr == config_file_name_ptr ? "" : config_file_name_ptr;
             }
             else
@@ -57,9 +57,9 @@ namespace staticoma
                 config_file_name_ = given_config_file_name;
             }
 
-            if (true == config_file_name_.empty())
+            if (config_file_name_.empty())
             {
-                if (true == ros::Time::waitForValid(clock_wait))
+                if (ros::Time::waitForValid(clock_wait))
                 {
                     const std_msgs::String::ConstPtr msg_ptr =
                             ros::topic::waitForMessage<std_msgs::String>("/staticoma/config", msg_wait);
@@ -73,7 +73,7 @@ namespace staticoma
             }
             else
             {
-                if (true == boost::filesystem::is_regular(config_file_name_))
+                if (boost::filesystem::is_regular(config_file_name_))
                 {
                     std::ifstream ifs(config_file_name_);
                     config_content_.str(std::string(std::istreambuf_iterator<char>(ifs), std::istreambuf_iterator<char>()));
@@ -98,9 +98,9 @@ namespace staticoma
             nh.param<std::string>("robot_description", model_param);
             robot_description_content_.str(model_param);
 
-            if (true == model_param.empty())
+            if (model_param.empty())
             {
-                if (true == ros::Time::waitForValid(clock_wait))
+                if (ros::Time::waitForValid(clock_wait))
                 {
                     const std_msgs::String::ConstPtr msg_ptr =
                             ros::topic::waitForMessage<std_msgs::String>("/staticoma/robot_description", msg_wait);
@@ -124,7 +124,7 @@ namespace staticoma
         template <class... t_Args>
         std::string getConfigString(t_Args &&... args)
         {
-            if (false == config_fetched_)
+            if (not config_fetched_)
             {
                 config_fetched_ = fetchConfig(std::forward<t_Args>(args)...);
             }
@@ -135,7 +135,7 @@ namespace staticoma
         template <class... t_Args>
         std::istream &getConfigStream(t_Args &&... args)
         {
-            if (false == config_fetched_)
+            if (not config_fetched_)
             {
                 config_fetched_ = fetchConfig(std::forward<t_Args>(args)...);
             }
@@ -147,7 +147,7 @@ namespace staticoma
         template <class... t_Args>
         std::string getRobotDescriptionString(t_Args &&... args)
         {
-            if (false == robot_description_fetched_)
+            if (not robot_description_fetched_)
             {
                 robot_description_fetched_ = fetchRobotDescription(std::forward<t_Args>(args)...);
             }
@@ -158,7 +158,7 @@ namespace staticoma
         template <class... t_Args>
         std::istream &getRobotDescriptionStream(t_Args &&... args)
         {
-            if (false == robot_description_fetched_)
+            if (not robot_description_fetched_)
             {
                 robot_description_fetched_ = fetchRobotDescription(std::forward<t_Args>(args)...);
             }
